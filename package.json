@@ -1,0 +1,12 @@
+{
+  "name": "xenocast",
+  "version": "1.4.0",
+  "private": true,
+  "description": "XenoCast CLI and MCP server for XenoCI: build on a rented Mac (GitHub login, no API keys)",
+  "type": "module",
+  "bin": { "xenocast": "dist/xenocast.mjs", "xenoci": "dist/xenoci.mjs", "xenoci-mcp": "dist/xenoci-mcp.mjs" },
+  "files": ["dist/xenocast.mjs", "dist/xenoci.mjs", "dist/xenoci-mcp.mjs", "README.md", "SETUP.md", "LICENSE"],
+  "engines": { "node": ">=18" },
+  "license": "MIT",
+  "homepage": "https://github.com/Xeno-CI/xenocast"
+}
