@@ -40,11 +40,13 @@ if (-not (($env:PATH -split ';') -contains $dir)) {
   Write-Host "added to the user PATH: $dir"
 }
 if (-not $noSetup) {
-  # Argument list, not a shell string. Redirect stdin from NUL so a piped irm|iex body is not setup's input.
+  # Start-Process requires an existing input file, not the Windows NUL device.
   # A direct -File run returns setup's code. irm|iex has no script path, so throw instead of exit: exit
   # there would close the caller's interactive shell, while the thrown error stays visible.
-  $input = if ($PSVersionTable.Platform -and $PSVersionTable.Platform -ne 'Win32NT') { '/dev/null' } else { 'NUL' }
-  $setup = Start-Process -FilePath $installed -ArgumentList @('setup', '--no-tui') -WorkingDirectory $dir -NoNewWindow -Wait -PassThru -RedirectStandardInput $input
+  $emptyInput = [IO.Path]::GetTempFileName()
+  try {
+    $setup = Start-Process -FilePath $installed -ArgumentList @('setup', '--no-tui') -WorkingDirectory $dir -NoNewWindow -Wait -PassThru -RedirectStandardInput $emptyInput
+  } finally { Remove-Item -Force $emptyInput }
   if ($setup.ExitCode -ne 0) {
     if ($PSCommandPath) { exit $setup.ExitCode }
     throw "xenocast setup exited $($setup.ExitCode)"
