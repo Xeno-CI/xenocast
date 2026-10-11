@@ -1,69 +1,182 @@
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/xenocast-dark.svg">
+  <img src=".github/assets/xenocast-light.svg" alt="XenoCast" width="320">
+</picture>
+
 # XenoCast
 
-XenoCI에서 빌린 Mac mini M4로 빌드하는 CLI(`xenocast`)와 MCP 서버입니다. GitHub으로 로그인하고, API 키는 쓰지 않습니다. 옛 이름 `xenoci`도 같은 명령으로 동작합니다(설치 스크립트가 `xenoci` 링크도 만듭니다). GitHub Actions 액션은 [Xeno-CI/build](https://github.com/Xeno-CI/build)에 있습니다.
+**지금 쓰는 컴퓨터에서, 내 Mac 빌드까지**
 
-**AI로 약 3분 셋업:** 쓰는 AI 에이전트에 이 주소 하나만 보내세요: https://github.com/Xeno-CI/xenocast/blob/main/SETUP.md
-에이전트가 보여 주는 로그인 링크를 열어 GitHub으로 승인하면 됩니다. [docs/quickstart-ai.md](docs/quickstart-ai.md), [Claude Code 연결](docs/claude-code.md)
+[![Release](https://img.shields.io/github/v/release/Xeno-CI/xenocast?style=flat-square&color=2563eb)](https://github.com/Xeno-CI/xenocast/releases) [![MIT License](https://img.shields.io/badge/license-MIT-475569?style=flat-square)](LICENSE) [![Docs](https://img.shields.io/badge/docs-xenoci.com-2563eb?style=flat-square)](https://xenoci.com/docs) [![Downloads](https://img.shields.io/github/downloads/Xeno-CI/xenocast/total?style=flat-square&color=475569)](https://github.com/Xeno-CI/xenocast/releases)
 
-## 설치와 로그인
+[한국어](README.md) | [English](README.en.md)
 
-Node 없이 쓰는 실행 파일 하나입니다. 설치 스크립트가 SHA256SUMS로 체크섬을 확인합니다.
+</div>
+
+## 설치
+
+macOS와 Linux
 
 ```sh
-curl -fsSL https://github.com/Xeno-CI/xenocast/releases/latest/download/install.sh | sh
-xenocast login                       # 링크를 열고 GitHub으로 로그인, 화면의 코드를 확인하고 승인
-xenocast setup --no-tui              # 설치된 AI 앱에 MCP 등록 + doctor + 빌린 Mac에서 연결 확인 빌드
-xenocast build --script ./ci.sh      # 현재 폴더 업로드 → 빌드 → 로그 → 빌드 종료 코드로 끝남
+curl -fsSL https://xenoci.com/install.sh | sh
 ```
 
-Windows (PowerShell):
+Windows PowerShell
 
 ```powershell
-irm https://github.com/Xeno-CI/xenocast/releases/latest/download/install.ps1 | iex
+irm https://xenoci.com/install.ps1 | iex
 ```
 
-로그인은 macOS 키체인, Windows 자격 증명 관리자, Linux secret-service에 저장되고, 셋 다 없으면 이 기기에 묶인 AES-256-GCM 암호화 파일에 저장됩니다. 접근 토큰은 약 1시간이고 CLI와 MCP 서버가 알아서 갱신합니다. `xenocast whoami`로 계정과 세션 만료를, `xenocast logout`으로 서버 폐기와 삭제를 합니다. 예전 API 키는 종료되었고, 쓰던 키가 있으면 `xenocast login`을 한 번 하면 됩니다.
+설치 한 줄이 GitHub 로그인, MCP 등록, 빌린 Mac에서 연결 확인 빌드까지 이어지며 로그인 링크에서 직접 승인하면 됩니다
 
-Node가 있으면 `npx -y -p github:xeno-ci/xenocast xenocast build --script ./ci.sh`도 같습니다. `--no-wait`는 접수만 하고 빌드 ID를 출력합니다. 작업을 중단(Ctrl+C, SIGTERM)하면 빌드도 취소됩니다. `--pr`, `--commit`을 주지 않으면 CI 변수와 `git rev-parse HEAD`로 PR 번호와 커밋을 자동으로 붙입니다.
+연결 확인 빌드에는 [대여 중인 Mac](https://xenoci.com/app/store)이 필요하며 대여와 결제는 직접 진행합니다
 
-## Mac과 남은 시간
+## AI에게 이 한 줄
 
-`xenocast macs`가 빌린 Mac, Xcode, 남은 시간을 보여 주고, 6시간 이하면 연장 명령을 함께 보여 줍니다. `xenocast extend <rt_id>`는 연장 주문을 만들고 결제 링크를 브라우저로 엽니다(결제는 사람이). 결제 뒤 `xenocast wait <주문번호>`로 반영을 기다립니다. Mac이 없으면 https://xenoci.com/app/store 에서 빌립니다.
+Claude Code, Codex, Cursor, opencode에 그대로 붙여 넣으세요
 
-## CI (GitHub Actions, GitLab, Jenkins 등)
+> https://raw.githubusercontent.com/Xeno-CI/xenocast/main/SETUP.md 를 읽고 이 컴퓨터에 XenoCast를 설정해 줘, GitHub 승인 링크를 보여 주고 빌린 Mac에서 연결 확인 빌드까지 검증해 줘
 
-CI에서는 로그인 대신 CI 토큰을 씁니다. 로그인한 컴퓨터에서 한 번 만들어 CI 시크릿 `XENOCAST_TOKEN`에 넣습니다. 토큰은 한 번만 출력되고 어디에도 저장되지 않습니다.
+[셋업 안내](https://raw.githubusercontent.com/Xeno-CI/xenocast/main/SETUP.md)에 현재 릴리스 설치 명령과 오류별 다음 행동이 있어 AI가 지금 바로 전체 설정을 진행할 수 있습니다
+
+## 왜 XenoCast
+
+**Mac 없이 Windows에서 iOS 빌드**
+프로젝트를 빌린 Mac mini M4로 보내 빌드합니다
+Xcode는 원격 Mac에서 실행하고, 나는 Windows나 Linux, macOS에서 작업합니다
+
+**내 AI가 빌드부터 로그 확인까지**
+MCP 도구 다섯 개로 빌드, 상태, 취소, 로그, Mac 목록을 다룹니다
+대화하던 AI가 작업을 시작하고 로그를 읽고 필요하면 취소합니다
+
+**공유 러너가 아닌 내 대여 Mac**
+공유 CI 러너 대신 내 대여에 배정된 Mac에서 빌드합니다
+`xenocast macs`로 Xcode 버전과 남은 대여 시간을 확인합니다
+
+**기존 CI에 빌드 전용 토큰 하나**
+GitHub Actions, GitLab, Jenkins에서 CI 토큰으로 연결합니다
+빌드와 상태, 로그, 취소, Mac 조회만 허용하고 서명이나 주문, 연장 권한은 주지 않습니다
+
+**서명과 TestFlight는 준비 중**
+원격 빌드와 결과물 다운로드는 지금 사용할 수 있습니다
+관리형 iOS 서명과 TestFlight 업로드는 이 셋업에서 아직 검증 전이므로 릴리스 배포 경로로 사용하지 않습니다
+
+## 첫 빌드
+
+프로젝트 폴더에서 저장소의 빌드 스크립트를 실행합니다
 
 ```sh
-xenocast token --ci --name "owner/name CI" --raw | gh secret set XENOCAST_TOKEN --repo owner/name
-xenocast token --ci --revoke <ses_id>    # 폐기 (웹의 로그인된 기기 화면에서도 가능)
-```
-
-CI 토큰은 빌드 전용입니다: 빌드, 상태, 로그, 취소, Mac 목록만 되고 서명, 주문, 연장은 되지 않습니다. 기본 만료는 90일입니다(`--expires 30d`).
-
-```sh
-# GitLab, Jenkins, CircleCI, Buildkite, Bitrise, Azure Pipelines: XENOCAST_TOKEN 비밀 변수를 두고
-curl -fsSL https://github.com/Xeno-CI/xenocast/releases/latest/download/install.sh | sh
 xenocast build --script ./ci.sh
 ```
 
-GitHub Actions는 [Xeno-CI/build](https://github.com/Xeno-CI/build) 액션에 `token: ${{ secrets.XENOCAST_TOKEN }}`을 넘깁니다. 포크 PR에 토큰이 새지 않게 하는 방법(`pull_request_target` 금지 예시 포함)은 [SETUP.md의 CI 연결](SETUP.md)을 보세요. CLI는 토큰 원문을 출력하지 않고, 빌드 로그에 섞여 나온 토큰 모양 문자열도 가려서 보여 줍니다.
+현재 폴더 업로드부터 로그 출력까지 기다리고 원격 빌드의 종료 코드로 끝납니다
+`--no-wait`는 빌드 ID만 출력하고, 기다리는 중 Ctrl+C를 누르면 원격 빌드도 취소합니다
 
-## AI 에이전트 (MCP: Claude Code, Codex, Cursor, opencode, OMO)
+## 자주 쓰는 명령
 
-`xenocast setup`이 설치된 AI 앱에 MCP 서버 `xenoci`(명령 `xenocast mcp`)를 등록합니다. 설정 파일에는 토큰을 넣지 않습니다. 직접 설정과 연결 확인: [mcp/CONNECT.md](mcp/CONNECT.md)
+| 할 일 | 명령 |
+| --- | --- |
+| 로그인과 계정 확인 | `xenocast login` / `xenocast whoami` |
+| AI 연결과 점검 | `xenocast setup --no-tui` / `xenocast doctor` |
+| Mac과 남은 시간 | `xenocast macs` |
+| 빌드 실행 | `xenocast build --script ./ci.sh` |
+| 상태와 로그 | `xenocast status <rb_id>` / `xenocast logs <rb_id>` |
+| 실패 원인과 취소 | `xenocast diagnose <rb_id>` / `xenocast cancel <rb_id>` |
+| 결과물 받기 | `xenocast artifacts <rb_id> --out ./dist` |
+| 로그인 폐기 | `xenocast logout` |
 
-공개 MCP 도구 5개: build, status, cancel, logs, macs.
-예전 도구 이름은 숨겨진 호환 별칭으로 계속 답하고, 주문, 연장, 서명처럼 MCP에서 뺀 일은 그 CLI 명령을 알려 줍니다.
+명령별 옵션은 `xenocast <명령> --help`, 전체 명령은 `xenocast --help`, 기계가 읽을 출력은 `--json`으로 확인합니다
 
-## 명령
+<details>
+<summary>결과물과 빌드 추적</summary>
 
-1.4.1부터 `xenocast <명령> --help`는 그 명령의 사용법과 옵션만 보여 줍니다. 알 수 없는 명령·옵션, 필수 값 누락 같은 사용 오류는 종료 코드 2이고 인증·서버·파일 오류는 1입니다. 빌드와 watch는 원격 빌드의 종료 코드를 그대로 돌려줍니다.
+```sh
+xenocast build --script ./ci.sh --artifacts 'build/*.xcarchive'
+xenocast artifacts <rb_id> --out ./dist
+```
 
-`xenocast login`, `xenocast logout`, `xenocast whoami`, `xenocast setup`, `xenocast token --ci`, `xenocast doctor`, `xenocast mcp`, `xenocast build --script ./ci.sh`, `xenocast status`, `xenocast logs <rb_id>`, `xenocast artifacts <rb_id> --out ./dist`, `xenocast cancel <rb_id>`, `xenocast watch`, `xenocast diagnose <rb_id>`, `xenocast macs`, `xenocast extend <rt_id>`, `xenocast catalog`, `xenocast order`, `xenocast orders`, `xenocast wait <주문번호>`, `xenocast reset`, `xenocast xcode`, `xenocast job <op_id>`, `xenocast errors`, `xenocast webhooks`, `xenocast ios`. 모든 명령 `--json`, 전체는 `xenocast --help`
+결과물은 7일 보관합니다
+`--pr`, `--commit`을 생략하면 CI 환경 변수와 현재 Git 커밋에서 추적 정보를 가져옵니다
+빌드와 watch는 원격 빌드의 종료 코드를 반환하며 사용법 오류는 2, 인증이나 서버, 파일 오류는 1입니다
 
-빌드 결과물(ipa, xcarchive, xcresult)은 `xenocast build --artifacts 'build/*.ipa'`로 남기고 `xenocast artifacts <id> --out ./dist`로 받습니다(7일 보관). 오류는 `{"error":{"code","message","retryable","next","request_id",...}}` 형식이고 `next`에 다음 행동이 들어 있습니다. iOS 서명, TestFlight 업로드(`xenocast ios archive|sign|ship`)는 검증 전입니다.
+</details>
 
-환경 변수: `XENOCAST_TOKEN`(CI 토큰, 있으면 저장된 로그인 대신 씀), `XENOCI_API_URL`(기본 https://xenoci.com), `XENOCAST_CREDENTIAL_STORE`(keychain, wincred, secret-service, file), `XENOCI_CONFIG_DIR`(저장 위치), `XENOCI_NO_BROWSER=1`(로그인 링크를 브라우저로 열지 않음)
+<details>
+<summary>GitHub Actions와 GitLab 등 CI 연결</summary>
 
-AI용 안내: https://xenoci.com/llms.txt, OpenAPI: https://xenoci.com/openapi.json, 오류 코드: https://xenoci.com/docs/errors
+로그인한 컴퓨터에서 토큰을 만들어 GitHub 시크릿으로 바로 보냅니다
+
+```sh
+xenocast token --ci --name "owner/name CI" --raw | gh secret set XENOCAST_TOKEN --repo owner/name
+```
+
+[GitHub Action](https://github.com/Xeno-CI/build)에 `token: ${{ secrets.XENOCAST_TOKEN }}`을 전달합니다
+GitLab과 다른 CI에서는 비밀 변수 `XENOCAST_TOKEN`을 등록하고 CLI로 빌드합니다
+
+```sh
+xenocast build --script ./ci.sh
+```
+
+CI 토큰은 기본 90일 후 만료하며 `--expires 30d`로 바꾸거나 `xenocast token --ci --revoke <ses_id>`로 폐기합니다
+포크 PR에는 토큰을 전달하지 않고 `pull_request_target`으로 외부 PR 코드를 실행하지 않습니다
+설치와 CI별 시크릿 등록은 [SETUP.md](SETUP.md)를 따르세요
+
+</details>
+
+<details>
+<summary>MCP 연결과 지원 AI</summary>
+
+`xenocast setup`이 설치된 Claude Code, Codex, Cursor, opencode, OMO에 MCP 서버 `xenoci`를 등록합니다
+서버 명령은 `xenocast mcp`이며 설정 파일에 토큰을 넣지 않습니다
+
+| 도구 | 역할 |
+| --- | --- |
+| `build` | 빌드 실행 |
+| `status` | 빌드 상태 |
+| `cancel` | 빌드 취소 |
+| `logs` | 빌드 로그 |
+| `macs` | Mac 목록 |
+
+등록 후 AI의 새 세션에서 연결을 확인하세요
+[직접 MCP 설정](mcp/CONNECT.md)과 [Claude Code 연결](docs/claude-code.md)에서 자세한 예제를 확인할 수 있습니다
+
+</details>
+
+<details>
+<summary>로그인과 보안</summary>
+
+API 키 대신 GitHub 로그인으로 연결합니다
+macOS 키체인, Windows 자격 증명 관리자, Linux secret-service를 사용하며 없으면 이 기기에 묶인 AES-256-GCM 암호화 파일에 저장합니다
+약 1시간짜리 접근 토큰은 CLI와 MCP가 자동 갱신하고 `xenocast logout`은 서버 세션도 폐기합니다
+설치 스크립트는 릴리스의 SHA256SUMS로 실행 파일을 확인합니다
+CI 토큰은 자격 저장소에 쓰지 않으며 빌드 로그에 섞인 토큰 모양 문자열은 가려서 출력합니다
+
+</details>
+
+<details>
+<summary>문제 해결과 환경 변수</summary>
+
+| 증상 | 다음 행동 |
+| --- | --- |
+| 명령을 찾지 못함 | 설치 출력의 PATH 안내 확인 |
+| 로그인이 없거나 만료됨 | `xenocast login` 후 `xenocast doctor` |
+| 대여 중인 Mac이 없음 | [Mac 대여](https://xenoci.com/app/store) 후 `xenocast macs` |
+| 빌드 실패 | `xenocast diagnose <rb_id>`와 `xenocast logs <rb_id>` |
+| AI에 도구가 안 보임 | `xenocast setup --no-tui` 후 AI 새 세션 시작 |
+
+| 환경 변수 | 용도 |
+| --- | --- |
+| `XENOCAST_TOKEN` | 저장된 로그인 대신 CI 토큰 사용 |
+| `XENOCI_API_URL` | API 주소, 기본 `https://xenoci.com` |
+| `XENOCAST_CREDENTIAL_STORE` | `keychain`, `wincred`, `secret-service`, `file` |
+| `XENOCI_CONFIG_DIR` | 설정 저장 위치 |
+| `XENOCI_NO_BROWSER=1` | 로그인 링크의 자동 브라우저 열기 생략 |
+
+이전 명령 이름 `xenoci`도 계속 동작합니다
+[오류 코드](https://xenoci.com/docs/errors)의 `next` 안내를 따라 다음 행동을 선택하세요
+
+</details>
+
+[문서](https://xenoci.com/docs) | [AI용 안내](https://xenoci.com/llms.txt) | [OpenAPI](https://xenoci.com/openapi.json) | [MIT 라이선스](LICENSE)
