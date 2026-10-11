@@ -53,12 +53,10 @@ GitHub Actions는 [Xeno-CI/build](https://github.com/Xeno-CI/build) 액션에 `t
 
 `xenocast setup`이 설치된 AI 앱에 MCP 서버 `xenoci`(명령 `xenocast mcp`)를 등록합니다. 설정 파일에는 토큰을 넣지 않습니다. 직접 설정과 연결 확인: [mcp/CONNECT.md](mcp/CONNECT.md)
 
-공개 MCP 도구 5개: build, status, cancel, logs, macs.
+공개 MCP 도구: budget, build, status, cancel, logs, macs, feedback, webhooks.
 예전 도구 이름은 숨겨진 호환 별칭으로 계속 답하고, 주문, 연장, 서명처럼 MCP에서 뺀 일은 그 CLI 명령을 알려 줍니다.
 
 ## 명령
-
-1.4.1부터 `xenocast <명령> --help`는 그 명령의 사용법과 옵션만 보여 줍니다. 알 수 없는 명령·옵션, 필수 값 누락 같은 사용 오류는 종료 코드 2이고 인증·서버·파일 오류는 1입니다. 빌드와 watch는 원격 빌드의 종료 코드를 그대로 돌려줍니다.
 
 `xenocast login`, `xenocast logout`, `xenocast whoami`, `xenocast setup`, `xenocast token --ci`, `xenocast doctor`, `xenocast mcp`, `xenocast build --script ./ci.sh`, `xenocast status`, `xenocast logs <rb_id>`, `xenocast artifacts <rb_id> --out ./dist`, `xenocast cancel <rb_id>`, `xenocast watch`, `xenocast diagnose <rb_id>`, `xenocast macs`, `xenocast extend <rt_id>`, `xenocast catalog`, `xenocast order`, `xenocast orders`, `xenocast wait <주문번호>`, `xenocast reset`, `xenocast xcode`, `xenocast job <op_id>`, `xenocast errors`, `xenocast webhooks`, `xenocast ios`. 모든 명령 `--json`, 전체는 `xenocast --help`
 
