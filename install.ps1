@@ -1,17 +1,27 @@
 # XenoCast CLI installer for Windows PowerShell 5.1+ / pwsh:
 #   irm https://github.com/Xeno-CI/xenocast/releases/latest/download/install.ps1 | iex
 # (the old address under Xeno-CI/build/releases serves this same file). Downloads xenocast-windows-x64.exe from
-# Xeno-CI/xenocast, verifies it against SHA256SUMS and installs it as xenocast.exe, plus a copy named xenoci.exe.
+# Xeno-CI/xenocast, verifies it against SHA256SUMS, installs it as xenocast.exe plus a copy named xenoci.exe,
+# then runs the installed executable as `setup --no-tui`.
+#   -NoSetup or $env:XENOCAST_NO_SETUP=1   install only
+# Unknown arguments fail before any download. When this script is piped into iex, setup does not read that pipe.
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
+$noSetup = $env:XENOCAST_NO_SETUP -eq '1'
+foreach ($arg in @($args)) {
+  if ($arg -eq '-NoSetup') { $noSetup = $true }
+  else { throw "xenocast: unknown argument: $arg" }
+}
 $version = if ($env:XENOCAST_VERSION) { $env:XENOCAST_VERSION } elseif ($env:XENOCI_VERSION) { $env:XENOCI_VERSION } else { 'latest' }
 $hostBase = if ($env:XENOCAST_INSTALL_BASE) { $env:XENOCAST_INSTALL_BASE.TrimEnd('/') } else { 'https://github.com' }
-$base = if ($version -eq 'latest') { "$hostBase/Xeno-CI/xenocast/releases/latest/download" } else { "$hostBase/Xeno-CI/xenocast/releases/download/$version" }
+$mirror = if ($env:XENOCI_BASE_URL) { $env:XENOCI_BASE_URL.TrimEnd('/') } else { $null }
+$base = if ($mirror) { $mirror } elseif ($version -eq 'latest') { "$hostBase/Xeno-CI/xenocast/releases/latest/download" } else { "$hostBase/Xeno-CI/xenocast/releases/download/$version" }
 $dir = if ($env:XENOCI_INSTALL_DIR) { $env:XENOCI_INSTALL_DIR } else { Join-Path $env:LOCALAPPDATA 'xenoci\bin' }
 New-Item -ItemType Directory -Force -Path $dir | Out-Null
 $asset = 'xenocast-windows-x64.exe'
 $tmp = Join-Path ([IO.Path]::GetTempPath()) ("xenocast-" + [guid]::NewGuid())
 New-Item -ItemType Directory -Path $tmp | Out-Null
+$installed = Join-Path $dir 'xenocast.exe'
 try {
   Invoke-WebRequest -UseBasicParsing -Uri "$base/$asset" -OutFile (Join-Path $tmp $asset)
   Invoke-WebRequest -UseBasicParsing -Uri "$base/SHA256SUMS" -OutFile (Join-Path $tmp 'SHA256SUMS')
@@ -21,11 +31,22 @@ try {
   $got = (Get-FileHash -Algorithm SHA256 (Join-Path $tmp $asset)).Hash.ToLower()
   if ($got -ne $want) { throw "checksum mismatch for $asset (expected $want, got $got)" }
   Copy-Item -Force (Join-Path $tmp $asset) (Join-Path $dir 'xenoci.exe')
-  Move-Item -Force (Join-Path $tmp $asset) (Join-Path $dir 'xenocast.exe')
+  Move-Item -Force (Join-Path $tmp $asset) $installed
 } finally { Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue }
-Write-Host "xenocast installed: $(Join-Path $dir 'xenocast.exe') (old name: xenoci.exe)"
+Write-Host "xenocast installed: $installed (old name: xenoci.exe)"
 if (-not (($env:PATH -split ';') -contains $dir)) {
   [Environment]::SetEnvironmentVariable('PATH', "$dir;" + [Environment]::GetEnvironmentVariable('PATH', 'User'), 'User')
   $env:PATH = "$dir;$env:PATH"
   Write-Host "added to the user PATH: $dir"
+}
+if (-not $noSetup) {
+  # Argument list, not a shell string. Redirect stdin from NUL so a piped irm|iex body is not setup's input.
+  # A direct -File run returns setup's code. irm|iex has no script path, so throw instead of exit: exit
+  # there would close the caller's interactive shell, while the thrown error stays visible.
+  $input = if ($PSVersionTable.Platform -and $PSVersionTable.Platform -ne 'Win32NT') { '/dev/null' } else { 'NUL' }
+  $setup = Start-Process -FilePath $installed -ArgumentList @('setup', '--no-tui') -WorkingDirectory $dir -NoNewWindow -Wait -PassThru -RedirectStandardInput $input
+  if ($setup.ExitCode -ne 0) {
+    if ($PSCommandPath) { exit $setup.ExitCode }
+    throw "xenocast setup exited $($setup.ExitCode)"
+  }
 }

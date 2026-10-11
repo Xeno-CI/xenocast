@@ -2,12 +2,22 @@
 # XenoCast CLI installer: curl -fsSL https://github.com/Xeno-CI/xenocast/releases/latest/download/install.sh | sh
 # (the old address https://github.com/Xeno-CI/build/releases/latest/download/install.sh serves this same file).
 # Downloads the single executable for this OS/CPU from Xeno-CI/xenocast, verifies it against SHA256SUMS, installs
-# `xenocast` and links the old name `xenoci` to it (existing scripts, CI jobs and MCP configs keep working).
+# `xenocast` and links the old name `xenoci` to it (existing scripts, CI jobs and MCP configs keep working), then
+# runs the installed binary as `setup --no-tui`. A piped installer must not hand its stdin to setup.
 #   XENOCAST_VERSION=v1.4.1    pin a release (default: latest; XENOCI_VERSION works too)
-#   XENOCI_INSTALL_DIR=/path   install directory (default: /usr/local/bin if writable, else ~/.local/bin)
+#   XENOCI_INSTALL_DIR=/path   install directory (default: ~/.local/bin)
 #   XENOCI_BASE_URL=url        download from a mirror holding the same release assets (flat folder)
 #   XENOCAST_INSTALL_BASE=url  the host in front of /Xeno-CI/xenocast/releases (default https://github.com)
+#   --no-setup or XENOCAST_NO_SETUP=1   install only; do not run setup
 set -eu
+no_setup=0
+for arg in "$@"; do
+  case "$arg" in
+    --no-setup) no_setup=1 ;;
+    *) echo "xenocast: unknown argument: $arg" >&2; exit 1 ;;
+  esac
+done
+[ "${XENOCAST_NO_SETUP:-}" = 1 ] && no_setup=1
 REPO=Xeno-CI/xenocast
 VERSION=${XENOCAST_VERSION:-${XENOCI_VERSION:-latest}}
 HOST=${XENOCAST_INSTALL_BASE:-https://github.com}
@@ -24,7 +34,6 @@ if [ "$libc" = -musl ] && [ ! -e /usr/lib/libstdc++.so.6 ]; then
   else echo "xenocast: this musl system needs libstdc++ (Alpine: apk add libstdc++)" >&2; exit 1; fi
 fi
 if [ -n "${XENOCI_INSTALL_DIR:-}" ]; then dir=$XENOCI_INSTALL_DIR
-elif [ -w /usr/local/bin ]; then dir=/usr/local/bin
 else dir="$HOME/.local/bin"; fi
 mkdir -p "$dir"
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT INT TERM
@@ -42,3 +51,7 @@ mv "$tmp/$asset" "$dir/xenocast"
 rm -f "$dir/xenoci" && ln -s xenocast "$dir/xenoci"
 echo "xenocast $installed installed: $dir/xenocast (old name: $dir/xenoci)"
 case ":$PATH:" in *":$dir:"*) ;; *) echo "add to PATH: export PATH=\"$dir:\$PATH\"" ;; esac
+if [ "$no_setup" = 0 ]; then
+  # stdin is /dev/null so `curl | sh` cannot feed the script body, or any later pipe, to setup.
+  "$dir/xenocast" setup --no-tui </dev/null
+fi
