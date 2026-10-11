@@ -1,6 +1,6 @@
 {
   "name": "xenocast",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "private": true,
   "description": "XenoCast CLI and MCP server for XenoCI: build on a rented Mac (GitHub login, no API keys)",
   "type": "module",

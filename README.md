@@ -58,6 +58,8 @@ GitHub Actions는 [Xeno-CI/build](https://github.com/Xeno-CI/build) 액션에 `t
 
 ## 명령
 
+1.4.1부터 `xenocast <명령> --help`는 그 명령의 사용법과 옵션만 보여 줍니다. 알 수 없는 명령·옵션, 필수 값 누락 같은 사용 오류는 종료 코드 2이고 인증·서버·파일 오류는 1입니다. 빌드와 watch는 원격 빌드의 종료 코드를 그대로 돌려줍니다.
+
 `xenocast login`, `xenocast logout`, `xenocast whoami`, `xenocast setup`, `xenocast token --ci`, `xenocast doctor`, `xenocast mcp`, `xenocast build --script ./ci.sh`, `xenocast status`, `xenocast logs <rb_id>`, `xenocast artifacts <rb_id> --out ./dist`, `xenocast cancel <rb_id>`, `xenocast watch`, `xenocast diagnose <rb_id>`, `xenocast macs`, `xenocast extend <rt_id>`, `xenocast catalog`, `xenocast order`, `xenocast orders`, `xenocast wait <주문번호>`, `xenocast reset`, `xenocast xcode`, `xenocast job <op_id>`, `xenocast errors`, `xenocast webhooks`, `xenocast ios`. 모든 명령 `--json`, 전체는 `xenocast --help`
 
 빌드 결과물(ipa, xcarchive, xcresult)은 `xenocast build --artifacts 'build/*.ipa'`로 남기고 `xenocast artifacts <id> --out ./dist`로 받습니다(7일 보관). 오류는 `{"error":{"code","message","retryable","next","request_id",...}}` 형식이고 `next`에 다음 행동이 들어 있습니다. iOS 서명, TestFlight 업로드(`xenocast ios archive|sign|ship`)는 검증 전입니다.
