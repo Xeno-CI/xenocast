@@ -19,7 +19,6 @@ if [ "$os" = linux ] && { [ -e /lib/ld-musl-x86_64.so.1 ] || [ -e /lib/ld-musl-a
 asset="xenocast-$os-$arch$libc"
 if [ -n "${XENOCI_BASE_URL:-}" ]; then base=${XENOCI_BASE_URL%/}
 elif [ "$VERSION" = latest ]; then base="${HOST%/}/$REPO/releases/latest/download"; else base="${HOST%/}/$REPO/releases/download/$VERSION"; fi
-# The musl build links libstdc++/libgcc dynamically; Alpine images often lack them.
 if [ "$libc" = -musl ] && [ ! -e /usr/lib/libstdc++.so.6 ]; then
   if command -v apk >/dev/null 2>&1 && [ "$(id -u)" = 0 ]; then apk add --no-cache -q libstdc++ libgcc >/dev/null
   else echo "xenocast: this musl system needs libstdc++ (Alpine: apk add libstdc++)" >&2; exit 1; fi
@@ -37,11 +36,9 @@ want=$(awk -v f="$asset" '$2 == f || $2 == "*" f { print $1 }' "$tmp/SHA256SUMS"
 if command -v sha256sum >/dev/null 2>&1; then got=$(sha256sum "$tmp/$asset" | awk '{print $1}'); else got=$(shasum -a 256 "$tmp/$asset" | awk '{print $1}'); fi
 [ "$got" = "$want" ] || { echo "xenocast: checksum mismatch for $asset (expected $want, got $got)" >&2; exit 1; }
 chmod 755 "$tmp/$asset"
-# macOS: a downloaded binary needs an ad-hoc signature after transfer on Apple silicon.
 [ "$os" = darwin ] && command -v codesign >/dev/null 2>&1 && codesign --force -s - "$tmp/$asset" >/dev/null 2>&1 || true
 installed=$("$tmp/$asset" --version 2>&1) || { echo "xenocast: $asset does not run on this system: $(echo "$installed" | head -1)" >&2; exit 1; }
 mv "$tmp/$asset" "$dir/xenocast"
-# The old name: a link to the same file. An older install left a real xenoci binary here; it is replaced by the link.
 rm -f "$dir/xenoci" && ln -s xenocast "$dir/xenoci"
 echo "xenocast $installed installed: $dir/xenocast (old name: $dir/xenoci)"
 case ":$PATH:" in *":$dir:"*) ;; *) echo "add to PATH: export PATH=\"$dir:\$PATH\"" ;; esac
