@@ -30,8 +30,22 @@ try {
   $want = ($line -split '\s+')[0].ToLower()
   $got = (Get-FileHash -Algorithm SHA256 (Join-Path $tmp $asset)).Hash.ToLower()
   if ($got -ne $want) { throw "checksum mismatch for $asset (expected $want, got $got)" }
+  $head = Get-Content -Raw -TotalCount 1 (Join-Path $tmp $asset) -ErrorAction SilentlyContinue
+  if (-not $head) { $head = [Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes((Join-Path $tmp $asset))[0..([Math]::Min(65535, ((Get-Item (Join-Path $tmp $asset)).Length - 1)))]) }
+  $mods = [regex]::Matches($head, "from '\./([A-Za-z0-9_.-]+)'") | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique
+  foreach ($mod in $mods) {
+    Invoke-WebRequest -UseBasicParsing -Uri "$base/$mod" -OutFile (Join-Path $tmp $mod)
+    $mline = Get-Content (Join-Path $tmp 'SHA256SUMS') | Where-Object { ($_ -split '\s+')[1] -in @($mod, "*$mod") }
+    if (-not $mline) { throw "$mod not listed in SHA256SUMS" }
+    $mwant = ($mline -split '\s+')[0].ToLower()
+    $mgot = (Get-FileHash -Algorithm SHA256 (Join-Path $tmp $mod)).Hash.ToLower()
+    if ($mgot -ne $mwant) { throw "checksum mismatch for $mod (expected $mwant, got $mgot)" }
+    Copy-Item -Force (Join-Path $tmp $mod) (Join-Path $dir $mod)
+  }
   Copy-Item -Force (Join-Path $tmp $asset) (Join-Path $dir 'xenoci.exe')
   Move-Item -Force (Join-Path $tmp $asset) $installed
+  & $installed --version | Out-Null
+  if ($LASTEXITCODE -ne 0) { throw "xenocast: installed executable does not run" }
 } finally { Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue }
 Write-Host "xenocast installed: $installed (old name: xenoci.exe)"
 if (-not (($env:PATH -split ';') -contains $dir)) {

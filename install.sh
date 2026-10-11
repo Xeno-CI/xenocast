@@ -45,9 +45,23 @@ want=$(awk -v f="$asset" '$2 == f || $2 == "*" f { print $1 }' "$tmp/SHA256SUMS"
 if command -v sha256sum >/dev/null 2>&1; then got=$(sha256sum "$tmp/$asset" | awk '{print $1}'); else got=$(shasum -a 256 "$tmp/$asset" | awk '{print $1}'); fi
 [ "$got" = "$want" ] || { echo "xenocast: checksum mismatch for $asset (expected $want, got $got)" >&2; exit 1; }
 chmod 755 "$tmp/$asset"
+# A release executable has no sibling imports. A Node entry that imports ./lib.mjs and the rest
+# cannot start until those files from the same release are installed beside it.
+mods=""
+if head -c 4096 "$tmp/$asset" | grep -q "from './"; then
+  mods=$(head -c 65536 "$tmp/$asset" | grep -oE "\./[A-Za-z0-9_.-]+\.mjs" | sed 's|^\./||' | sort -u)
+  for mod in $mods; do
+    fetch "$base/$mod" "$tmp/$mod" || { echo "xenocast: $asset imports ./$mod but the release has no such file" >&2; exit 1; }
+    mwant=$(awk -v f="$mod" '$2 == f || $2 == "*" f { print $1 }' "$tmp/SHA256SUMS")
+    [ -n "$mwant" ] || { echo "xenocast: $mod not listed in SHA256SUMS" >&2; exit 1; }
+    if command -v sha256sum >/dev/null 2>&1; then mgot=$(sha256sum "$tmp/$mod" | awk '{print $1}'); else mgot=$(shasum -a 256 "$tmp/$mod" | awk '{print $1}'); fi
+    [ "$mgot" = "$mwant" ] || { echo "xenocast: checksum mismatch for $mod (expected $mwant, got $mgot)" >&2; exit 1; }
+  done
+fi
 [ "$os" = darwin ] && command -v codesign >/dev/null 2>&1 && codesign --force -s - "$tmp/$asset" >/dev/null 2>&1 || true
-installed=$("$tmp/$asset" --version 2>&1) || { echo "xenocast: $asset does not run on this system: $(echo "$installed" | head -1)" >&2; exit 1; }
 mv "$tmp/$asset" "$dir/xenocast"
+for mod in $mods; do mv "$tmp/$mod" "$dir/$mod"; done
+installed=$("$dir/xenocast" --version 2>&1) || { echo "xenocast: $asset does not run on this system: $(echo "$installed" | head -1)" >&2; exit 1; }
 rm -f "$dir/xenoci" && ln -s xenocast "$dir/xenoci"
 echo "xenocast $installed installed: $dir/xenocast (old name: $dir/xenoci)"
 case ":$PATH:" in *":$dir:"*) ;; *) echo "add to PATH: export PATH=\"$dir:\$PATH\"" ;; esac
