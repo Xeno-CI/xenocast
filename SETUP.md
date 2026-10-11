@@ -24,7 +24,7 @@ XenoCast 셋업
 
    Windows(PowerShell): `irm https://github.com/Xeno-CI/xenocast/releases/latest/download/install.ps1 | iex`
    설치 명령이 종료 코드 0으로 끝나면 다음으로. 실패하면 설치 출력 전체를 사용자에게 보여 준다.
-2. `xenocast --version`을 실행한다. 버전이 `1.4.1` 이상이면 다음으로. 명령을 못 찾으면 `export PATH="$HOME/.local/bin:$PATH"` 후 다시 확인하고, 그래도 안 되면 1의 출력을 사용자에게 보여 준다.
+2. `xenocast --version`을 실행한다. 버전이 `1.4.0` 이상이면 다음으로. 명령을 못 찾으면 `export PATH="$HOME/.local/bin:$PATH"` 후 다시 확인하고, 그래도 안 되면 1의 출력을 사용자에게 보여 준다.
 
 로그인
 3. `xenocast whoami`를 실행한다. 종료 코드 0이면 이미 로그인돼 있다. 4로 간다.
@@ -67,7 +67,7 @@ Mac
    사용자가 지금 돌리라고 하면 그 명령을 실행하고, 종료 코드(= 빌드 종료 코드)와 빌드 ID를 적어 두고 다음으로. 실패하면 `xenocast diagnose <rb_id>` 결과를 보여 준다.
 
 완료 보고
-9. 사용자에게 알린다: 로그인한 계정(가려진 이메일), 연결 확인 빌드 ID(`rb_...`)와 결과, Mac의 macOS, Xcode 버전과 남은 시간, MCP를 등록한 에이전트 목록(새 세션부터 `xenoci` 도구 5개 build, status, cancel, logs, macs가 보인다), 8에서 정한 빌드 대상과 명령.
+9. 사용자에게 알린다: 로그인한 계정(가려진 이메일), 연결 확인 빌드 ID(`rb_...`)와 결과, Mac의 macOS, Xcode 버전과 남은 시간, MCP를 등록한 에이전트 목록(새 세션부터 `xenoci` 도구 build, status, cancel, logs, macs, feedback이 보인다), 8에서 정한 빌드 대상과 명령.
    완료라고 말할 때는 증거를 반드시 붙인다: 연결 확인 빌드의 job id(`rb_...`)와 상태 `succeeded`, `xenocast doctor` 출력의 결과 줄 몇 개. 증거 없이 "다 됐다"고만 쓰지 않는다. 토큰 값은 붙이지 않는다.
 10. 그다음 한 번만 묻는다: "XenoCast 저장소(Xeno-CI/xenocast)에 GitHub 스타를 누를까요?"
    - 사용자가 yes라고 답했을 때만 `gh api -X PUT user/starred/Xeno-CI/xenocast`를 실행한다(`gh repo star`가 없는 gh 버전이 있다).
@@ -75,6 +75,8 @@ Mac
    - 묻지 않고 누르지 않는다. no거나 답이 없으면 아무것도 하지 않는다.
 
 CI 연결
+빌드가 막히면 브라우저로 이동하지 말고 `xenocast feedback "무슨 일이 있었는지"`로 남긴다
+
 CI에서는 로그인 대신 CI 토큰을 쓴다. CI 토큰은 빌드 전용이다: 빌드 실행, 상태, 로그, 취소, Mac 목록만 되고 서명, 주문, 연장은 되지 않는다. 기본 만료 90일이고 `xenocast token --ci --revoke <id>` 또는 웹의 로그인된 기기 화면에서 폐기한다.
 C1. 먼저 사용하는 CI와 토큰을 넣을 저장소 또는 조직을 사용자에게 확인한다. 로그인한 컴퓨터에서 토큰을 만들어 화면을 거치지 않고 바로 시크릿에 넣는다. GitHub 저장소라면:
 

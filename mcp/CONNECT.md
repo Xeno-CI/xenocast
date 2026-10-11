@@ -83,7 +83,7 @@ tool_timeout_sec = 600
 
 ## 2. 연결 확인
 
-공개 MCP 도구는 5개입니다: `build`, `status`, `cancel`, `logs`, `macs`. 예전 도구 이름(`build_status`, `wait_build`, `list_macs` 등)은 숨겨진 호환 별칭으로 계속 답합니다. 주문, 연장, 서명, 시뮬레이터, 시크릿, 웹훅처럼 MCP에서 뺀 일은 그 CLI 명령을 알려 주는 `moved_to_cli` 오류로 답합니다(`xenocast --help`).
+공개 MCP 도구는 6개입니다: `build`, `status`, `cancel`, `logs`, `macs`, `webhooks`. 예전 도구 이름(`build_status`, `wait_build`, `list_macs` 등)은 숨겨진 호환 별칭으로 계속 답합니다. 웹훅은 `webhooks`의 `list`, `add`, `test`, `remove` action으로 관리합니다. 서명, 시뮬레이터, 시크릿처럼 CLI로 옮긴 이름은 해당 명령을 알려 주는 `moved_to_cli` 오류로 답합니다. 주문·연장 등 목록에 없는 이름은 JSON-RPC `-32602`이며 CLI에서 사용합니다(`xenocast --help`).
 
 에이전트에게 "xenoci macs 도구를 불러 줘"라고 합니다. 로그인한 계정과 빌린 Mac이 보이면 됩니다. 오류가 나면 `error.code`를 봅니다.
 
@@ -101,7 +101,7 @@ tool_timeout_sec = 600
 1. `macs`: 빌린 Mac과 남은 시간. 없거나 6시간 이하면 `extend_hint`의 링크를 사람에게 보여 줍니다(결제는 사람이)
 2. `build`: `dir`에 프로젝트 폴더의 절대 경로, `script`에 예: `xcodebuild -scheme App -destination generic/platform=iOS -archivePath build/App.xcarchive archive CODE_SIGNING_ALLOWED=NO`, `artifacts: ["build/App.xcarchive"]`. 빌드 ID가 바로 돌아옵니다. 이 결과는 서명 전 archive이며 IPA가 아닙니다
 3. `status`(`id`, `wait: true`): 끝날 때까지 기다리고, 실패하면 실패 요약(분류, 첫 오류 file:line, 다음 행동)과 마지막 로그 줄이 함께 옵니다
-4. `logs`(`id`, `out: "./dist"`, `artifacts: true`): 전체 로그와 결과물을 파일로 저장하고 경로, 크기, sha256만 답합니다
+4. `logs`(`id`, `out: "./dist"`, `artifacts: true`): 전체 로그와 결과물을 파일로 저장하고 경로, 크기, sha256과 마지막 40줄, 실패 요약을 답합니다
 5. 멈추려면 `cancel`(`id`)
 
 Mac은 `ends_at`에 저절로 끝나고 VM이 지워집니다. 결과물은 그 전에 받으세요. 서명, TestFlight는 검증 전입니다
