@@ -3,7 +3,10 @@
 # (the old address https://github.com/Xeno-CI/build/releases/latest/download/install.sh serves this same file).
 # Downloads the single executable for this OS/CPU from Xeno-CI/xenocast, verifies it against SHA256SUMS, installs
 # `xenocast` and links the old name `xenoci` to it (existing scripts, CI jobs and MCP configs keep working), then
-# runs the installed binary as `setup --no-tui`. A piped installer must not hand its stdin to setup.
+# runs the installed binary as `setup --no-tui --runner2 --from-installer`: with an API key that checks and saves the key and
+# registers `xenocast mcp` with the installed AI agents. A piped installer must not hand its stdin to setup.
+#   curl -fsSL …/install.sh | XENOCI_API_KEY=xci_live_… sh   the one line from the console (key in the environment, never argv)
+#   no key: at a terminal setup asks for it (hidden input from /dev/tty); elsewhere it prints the next step and exits 0
 #   XENOCAST_VERSION=v1.4.1    pin a release (default: latest; XENOCI_VERSION works too)
 #   XENOCI_INSTALL_DIR=/path   install directory (default: ~/.local/bin)
 #   XENOCI_BASE_URL=url        download from a mirror holding the same release assets (flat folder)
@@ -66,6 +69,11 @@ rm -f "$dir/xenoci" && ln -s xenocast "$dir/xenoci"
 echo "xenocast $installed installed: $dir/xenocast (old name: $dir/xenoci)"
 case ":$PATH:" in *":$dir:"*) ;; *) echo "add to PATH: export PATH=\"$dir:\$PATH\"" ;; esac
 if [ "$no_setup" = 0 ]; then
-  # stdin is /dev/null so `curl | sh` cannot feed the script body, or any later pipe, to setup.
-  "$dir/xenocast" setup --no-tui </dev/null
+  # stdin is /dev/null so `curl | sh` cannot feed the script body, or any later pipe, to setup. Only when no key was
+  # given and a person is at a terminal does setup read the key from /dev/tty (hidden prompt), never from the pipe.
+  if [ -z "${XENOCI_API_KEY:-}" ] && [ -t 2 ] && { : </dev/tty; } 2>/dev/null; then
+    "$dir/xenocast" setup --runner2 --from-installer </dev/tty
+  else
+    "$dir/xenocast" setup --no-tui --runner2 --from-installer </dev/null
+  fi
 fi
