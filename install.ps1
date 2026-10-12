@@ -2,7 +2,10 @@
 #   irm https://github.com/Xeno-CI/xenocast/releases/latest/download/install.ps1 | iex
 # (the old address under Xeno-CI/build/releases serves this same file). Downloads xenocast-windows-x64.exe from
 # Xeno-CI/xenocast, verifies it against SHA256SUMS, installs it as xenocast.exe plus a copy named xenoci.exe,
-# then runs the installed executable as `setup --no-tui`.
+# then runs the installed executable as `setup --no-tui --runner2 --from-installer`: with an API key it checks and saves the key
+# and registers `xenocast mcp` with the installed AI agents.
+#   $env:XENOCI_API_KEY="xci_live_..."; irm .../install.ps1 | iex   the one line from the console (key in the environment)
+#   no key: setup prints the next step and the install still succeeds
 #   -NoSetup or $env:XENOCAST_NO_SETUP=1   install only
 # Unknown arguments fail before any download. When this script is piped into iex, setup does not read that pipe.
 $ErrorActionPreference = 'Stop'
@@ -59,7 +62,7 @@ if (-not $noSetup) {
   # there would close the caller's interactive shell, while the thrown error stays visible.
   $emptyInput = [IO.Path]::GetTempFileName()
   try {
-    $setup = Start-Process -FilePath $installed -ArgumentList @('setup', '--no-tui') -WorkingDirectory $dir -NoNewWindow -Wait -PassThru -RedirectStandardInput $emptyInput
+    $setup = Start-Process -FilePath $installed -ArgumentList @('setup', '--no-tui', '--runner2', '--from-installer') -WorkingDirectory $dir -NoNewWindow -Wait -PassThru -RedirectStandardInput $emptyInput
   } finally { Remove-Item -Force $emptyInput }
   if ($setup.ExitCode -ne 0) {
     if ($PSCommandPath) { exit $setup.ExitCode }
