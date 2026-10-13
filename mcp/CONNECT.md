@@ -97,6 +97,7 @@ tool_timeout_sec = 600
 
 1. `list_runners`: 쓸 수 있는 러너와 분당 단가
 2. `build`: `dir`에 프로젝트 폴더의 절대 경로, `script`에 빌드 명령, `artifacts: ["build/App.xcarchive"]`. 잡 ID가 바로 돌아옵니다
+   같은 소스와 설정이 24시간 안에 성공했으면 실행하지 않고 그 잡을 `same_build: true`로 돌려줍니다, 다시 돌리려면 `force: true`. 같은 종류의 빌드를 새로 보낼 때 앞선 잡을 멈추려면 `lane`과 `supersede: true`
 3. `status`(`id`): 상태, 금액, 마지막 로그 줄
 4. `logs`(`id`, `out: "./dist"`): 전체 로그와 결과물을 파일로 저장
 5. 멈추려면 `cancel`(`id`)

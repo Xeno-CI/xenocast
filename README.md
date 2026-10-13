@@ -34,6 +34,8 @@ irm https://github.com/Xeno-CI/xenocast/releases/latest/download/install.ps1 | i
 
 ## 명령
 
+같은 소스와 같은 설정(스크립트, Xcode, 러너, env, 결과물 경로)으로 24시간 안에 성공한 잡이 있으면 `xenocast build`는 업로드와 실행 없이 그 잡 ID를 알려 주고 종료 코드 0으로 끝납니다, 다시 실행하려면 `--force`를 붙입니다. `--lane 이름 --supersede`는 같은 워크스페이스에서 같은 작업 이름의 앞선 대기, 실행 잡을 새 잡 접수 뒤 취소합니다(대기 중이던 잡은 0원, 실행 중이던 잡은 시작한 분까지만 과금). MCP `build`도 같은 `force`, `lane`, `supersede` 인자를 받습니다
+
 `xenocast setup`, `xenocast config`, `xenocast whoami`, `xenocast credits`, `xenocast usage`, `xenocast runners`, `xenocast build --script ./ci.sh`, `xenocast status <job_id>`, `xenocast jobs`, `xenocast logs <job_id>`, `xenocast cancel <job_id>`, `xenocast wait <job_id>`, `xenocast artifacts <job_id> --out ./dist`, `xenocast mcp`. 모든 명령 `--json`, 전체는 `xenocast --help`
 
 충전은 사람이 콘솔에서 합니다. `xenocast credits topup`은 충전 링크만 보여 줍니다. 오류는 `{"error":{"code","message","retryable","next",...}}` 형식이고 `next`에 다음 행동이 들어 있습니다
