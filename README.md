@@ -29,7 +29,7 @@ irm https://github.com/Xeno-CI/xenocast/releases/latest/download/install.ps1 | i
 
 `xenocast setup`이 설치된 AI 앱에 MCP 서버 `xenoci`(명령 `xenocast mcp`)를 등록합니다. 설정 파일에는 키를 넣지 않습니다. 직접 설정: [mcp/CONNECT.md](mcp/CONNECT.md)
 
-공개 MCP 도구: build, status, cancel, logs, list_runners, whoami, credits, usage.
+공개 MCP 도구 11개: build, status, cancel, logs, list_runners, whoami, credits, usage, failure, compare, search_log.
 키가 없어도 도구 목록은 같고, 호출하면 `api_key_required`로 답합니다
 
 ## 명령
@@ -44,4 +44,4 @@ irm https://github.com/Xeno-CI/xenocast/releases/latest/download/install.ps1 | i
 
 CI 비밀 변수 `XENOCI_API_KEY`에 콘솔에서 발급한 키를 넣고 설치 후 `xenocast build --script ./ci.sh`를 실행합니다. GitHub Actions는 [Xeno-CI/build](https://github.com/Xeno-CI/build) 액션에 같은 키를 `api-key`로 넘깁니다. CLI는 키 원문을 출력하지 않고, 로그에 섞여 나온 키 모양 문자열도 가립니다
 
-문서: https://xenoci.com/docs/agents/cli, MCP: https://xenoci.com/docs/agents/mcp
+문서: https://xenoci.com/docs/agents/xenocast, MCP: https://xenoci.com/docs/agents/xenocast#ai-앱에서-쓸-때
