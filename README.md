@@ -1,6 +1,6 @@
 # XenoCast
 
-XenoCI macOS 러너에 잡을 보내는 CLI(`xenocast`)와 MCP 서버입니다. 인증은 XenoCI 콘솔에서 발급한 API 키(`xci_live_…`) 하나뿐입니다. 옛 이름 `xenoci`도 같은 명령으로 동작합니다(설치 스크립트가 `xenoci` 링크도 만듭니다)
+XenoCI macOS 러너에 잡을 보내는 CLI(`xenocast`)와 MCP 서버입니다. 잡을 보내는 인증은 XenoCI 콘솔에서 발급한 API 키(`xci_live_…`)입니다, 조직 관리 명령 `xenocast admin`만 따로 관리자 키(`xci_admin_…`)를 씁니다. 옛 이름 `xenoci`도 같은 명령으로 동작합니다(설치 스크립트가 `xenoci` 링크도 만듭니다)
 
 **AI로 셋업:** 쓰는 AI 에이전트에 이 주소 하나만 보내세요: https://github.com/Xeno-CI/xenocast/blob/main/SETUP.md
 사람이 하는 일은 콘솔(https://xenoci.com/console)에서 크레딧 충전과 API 키 발급, 키를 비밀 저장소에 넣는 것입니다. AI가 비밀 저장소에서 키를 받아 `xenocast setup`을 실행하고 MCP를 등록합니다. [docs/quickstart-ai.md](docs/quickstart-ai.md), [Claude Code 연결](docs/claude-code.md)
