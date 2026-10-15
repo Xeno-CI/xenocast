@@ -1,6 +1,6 @@
 {
   "name": "xenocast",
-  "version": "1.7.7",
+  "version": "1.7.8",
   "private": true,
   "description": "XenoCast CLI and MCP server for XenoCI: macOS jobs with a console API key",
   "type": "module",

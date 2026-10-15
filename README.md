@@ -3,7 +3,7 @@
 XenoCI macOS 러너에 잡을 보내는 CLI(`xenocast`)와 MCP 서버입니다. 잡을 보내는 인증은 XenoCI 콘솔에서 발급한 API 키(`xci_live_…`)입니다, 조직 관리 명령 `xenocast admin`만 따로 관리자 키(`xci_admin_…`)를 씁니다. 옛 이름 `xenoci`도 같은 명령으로 동작합니다(설치 스크립트가 `xenoci` 링크도 만듭니다)
 
 **AI로 셋업:** 쓰는 AI 에이전트에 이 주소 하나만 보내세요: https://github.com/Xeno-CI/xenocast/blob/main/SETUP.md
-사람이 하는 일은 콘솔(https://xenoci.com/console)에서 크레딧 충전과 API 키 발급, 키를 비밀 저장소에 넣는 것입니다. AI가 비밀 저장소에서 키를 받아 `xenocast setup`을 실행하고 MCP를 등록합니다. [docs/quickstart-ai.md](docs/quickstart-ai.md), [Claude Code 연결](docs/claude-code.md)
+사람이 하는 일은 [콘솔](https://xenoci.com/console)에서 크레딧 충전과 API 키 발급, 키를 비밀 저장소에 넣는 것입니다. AI가 비밀 저장소에서 키를 받아 `xenocast setup`을 실행하고 MCP를 등록합니다. [docs/quickstart-ai.md](docs/quickstart-ai.md), [Claude Code 연결](docs/claude-code.md)
 
 ## 설치와 키
 
@@ -11,6 +11,7 @@ Node 없이 쓰는 실행 파일 하나입니다. 설치 스크립트가 SHA256S
 
 ```sh
 curl -fsSL https://github.com/Xeno-CI/xenocast/releases/latest/download/install.sh | XENOCAST_NO_SETUP=1 sh
+export PATH="$HOME/.local/bin:$PATH"   # install.sh 는 ~/.local/bin 에 설치하고 PATH 는 바꾸지 않음
 export XENOCI_API_KEY="$(security find-generic-password -a "$USER" -s XENOCI_API_KEY -w)"   # 비밀 저장소에서 키 꺼내기(macOS 키체인 예)
 xenocast setup --no-tui --key-env XENOCI_API_KEY   # 키 확인, 이 컴퓨터에 키 저장, 설치된 AI 앱에 MCP 등록, MCP 서버 확인
 unset XENOCI_API_KEY
@@ -29,7 +30,7 @@ irm https://github.com/Xeno-CI/xenocast/releases/latest/download/install.ps1 | i
 
 `xenocast setup`이 설치된 AI 앱에 MCP 서버 `xenoci`(명령 `xenocast mcp`)를 등록합니다. 설정 파일에는 키를 넣지 않습니다. 직접 설정: [mcp/CONNECT.md](mcp/CONNECT.md)
 
-공개 MCP 도구 11개: build, status, cancel, logs, list_runners, whoami, credits, usage, failure, compare, search_log.
+공개 MCP 도구 11개: build, status, cancel, logs, list_runners, whoami, credits, usage, failure, compare, search_log. xenocast 1.7.0 이상 기준이고, 그보다 옛 버전은 `failure`, `compare`, `search_log`가 없는 8개라 설치 줄을 다시 실행해 업데이트합니다([업데이트 방법](https://xenoci.com/docs/resources/clients#설치와-로그인)).
 키가 없어도 도구 목록은 같고, 호출하면 `api_key_required`로 답합니다
 
 ## 명령
